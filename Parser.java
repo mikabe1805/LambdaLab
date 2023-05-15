@@ -96,7 +96,7 @@ public class Parser {
 					}
 					i++;
 				}
-				ArrayList<String> leftt = new ArrayList<>(left1.subList(0, n-1));
+				ArrayList<String> leftt = new ArrayList<>(left1.subList(0, n-1)); // error around here, it can't handle everything being in 1 set of paranthesis
 				Node left = new Node(leftt);
 				curnode.left = left;
 //				if (n == tokens.size()-2) {
@@ -106,6 +106,7 @@ public class Parser {
 					newtoks = new ArrayList<String>(tokens.subList(n+1, tokens.size()));
 				}
 				curnode.data = prob;
+				System.out.println(tokens.subList(1, n).toString());
 				parse(new ArrayList<String>(tokens.subList(1, n)), left);
 				
 			} else {
@@ -237,10 +238,22 @@ public class Parser {
 	
 	public ArrayList<String> preParse(ArrayList<String> tokens) {
 		int n;
+//		for (int i = 0; i < tokens.size(); i++) {
+//			if (tokens.get(i).equals("\\")) {
+//				if (i == 0 || !tokens.get(i-1).equals("(")) {
+//					tokens.add(i, "(");
+//					n = i;
+//					while (n < tokens.size() && !tokens.get(n).equals(")")) {
+//						n++;
+//					}
+//					tokens.add(n, ")");
+//				}
+//			}
+//		}
 		for (int i = 0; i < tokens.size(); i++) {
-			if (tokens.get(i).equals("\\")) {
+			if (tokens.get(i).equals(".")) {
 				if (i == 0 || !tokens.get(i-1).equals("(")) {
-					tokens.add(i, "(");
+					tokens.add(i+1, "(");
 					n = i;
 					while (n < tokens.size() && !tokens.get(n).equals(")")) {
 						n++;
