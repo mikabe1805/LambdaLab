@@ -18,4 +18,21 @@ public class Parser {
 		
 		return var;
 	}
+	
+	public ArrayList<String> preParse(ArrayList<String> tokens) {
+		int n;
+		for (int i = 0; i < tokens.size(); i++) {
+			if (tokens.get(i).equals("\\")) {
+				if (i == 0 || !tokens.get(i-1).equals("(")) {
+					tokens.add(i, "(");
+					n = i;
+					while (n < tokens.size() && !tokens.get(n).equals(")")) {
+						n++;
+					}
+					tokens.add(n, ")");
+				}
+			}
+		}
+		return tokens;
+	}
 }

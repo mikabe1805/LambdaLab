@@ -35,7 +35,7 @@ public class Lexer {
 			} else if (input.charAt(i) == ' ') {
 				// skip
 			} else {
-				while (!special.contains(input.charAt(i)) && input.charAt(i) != ' ' && input.charAt(i) != ';') {
+				while (i < input.length() && !special.contains(input.charAt(i)) && input.charAt(i) != ' ' && input.charAt(i) != ';') {
 					in += input.charAt(i);
 					i++;
 				}

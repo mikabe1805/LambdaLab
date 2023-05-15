@@ -23,9 +23,10 @@ public class Console {
 			String output = "";
 			
 			try {
-				Expression exp = parser.parse(tokens);
-				//output = exp.toString();
-				output = tokens.toString();
+				//Expression exp = parser.parse(tokens);
+				output = parser.preParse(tokens).toString();
+				// output = exp.toString();
+				// output = tokens.toString();
 			} catch (Exception e) {
 				System.out.println("Unparsable expression, input was: \"" + input + "\"");
 				input = cleanConsoleInput();
