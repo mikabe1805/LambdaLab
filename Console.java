@@ -4,6 +4,8 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import Parser.Node;
+
 
 public class Console {
 	private static Scanner in;
@@ -21,17 +23,29 @@ public class Console {
 			ArrayList<String> tokens = lexer.tokenize(input);
 
 			String output = "";
+			Parser.Node tree = new Parser.Node(null);
 			
 			try {
-				Expression exp = parser.parse(tokens);
-				output = exp.toString();
+				//Expression exp = parser.parse(tokens);
+//				Parser.Node root = null;
+//				output = parser.preParse(tokens).toString();
+//				tree = parser.parse(tokens, root);
+//				// output = exp.toString();
+				// output = tokens.toString();
 			} catch (Exception e) {
 				System.out.println("Unparsable expression, input was: \"" + input + "\"");
 				input = cleanConsoleInput();
 				continue;
 			}
 			
+			Parser.Node root = new Parser.Node(null);
+			output = parser.preParse(tokens).toString();
+			tree = parser.parse(tokens, root);
+//			 output = exp.toString();
+			
 			System.out.println(output);
+			//System.out.println(tree.toString());
+			System.out.println(parser.toString(tree));
 			
 			input = cleanConsoleInput();
 		}
