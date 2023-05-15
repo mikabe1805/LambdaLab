@@ -17,17 +17,33 @@ public class Lexer {
 	 */
 	public ArrayList<String> tokenize(String input) {
 		ArrayList<String> tokens = new ArrayList<String>();
+		ArrayList<Character> special = new ArrayList<>();
+		special.add('('); special.add(')'); special.add('\\'); special.add('.'); special.add('=');
+		String in = "";
+		// char[] special = {'(', ')', '\\', '.', '='};
+		if (input.equals("")) {
+			tokens.add(input);
+			return tokens;
+		}
 
-//		for (int i = 0; i < input.length(); i++) {
-//			if (input.charAt(i) == ';') {
-//				break;
-//			}
-//			if (input.charAt(i) == '(' || input.charAt(i) == ')' || input.charAt(i) == '\' 
-//					|| input.charAt(i) == '.' || input.charAt(i) == '=')
-//			
-//		}
-
-		tokens.add(input);
+		for (int i = 0; i < input.length(); i++) {
+			if (input.charAt(i) == ';') {
+				return tokens;
+			}
+			if (special.contains(input.charAt(i))) {
+				tokens.add( "" + input.charAt(i));
+			} else if (input.charAt(i) == ' ') {
+				// skip
+			} else {
+				while (!special.contains(input.charAt(i)) && input.charAt(i) != ' ' && input.charAt(i) != ';') {
+					in += input.charAt(i);
+					i++;
+				}
+				tokens.add(in);
+				i --;
+				in = "";
+			}
+		}
 		return tokens;
 	}
 
