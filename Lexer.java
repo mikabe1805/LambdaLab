@@ -18,9 +18,16 @@ public class Lexer {
 	public ArrayList<String> tokenize(String input) {
 		ArrayList<String> tokens = new ArrayList<String>();
 
-		// This next line is definitely incorrect!
-		tokens.add(input);
+//		for (int i = 0; i < input.length(); i++) {
+//			if (input.charAt(i) == ';') {
+//				break;
+//			}
+//			if (input.charAt(i) == '(' || input.charAt(i) == ')' || input.charAt(i) == '\' 
+//					|| input.charAt(i) == '.' || input.charAt(i) == '=')
+//			
+//		}
 
+		tokens.add(input);
 		return tokens;
 	}
 
