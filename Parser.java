@@ -97,6 +97,10 @@ public class Parser {
 					i++;
 				}
 				ArrayList<String> leftt = new ArrayList<>(left1.subList(0, n-1)); // error around here, it can't handle everything being in 1 set of paranthesis
+				if (n == tokens.size() - 1) {
+					System.out.println("hi");
+					parse(leftt, curnode); // MAYBE problem
+				}
 				Node left = new Node(leftt);
 				curnode.left = left;
 //				if (n == tokens.size()-2) {
@@ -107,7 +111,7 @@ public class Parser {
 				}
 				curnode.data = prob;
 				System.out.println(tokens.subList(1, n).toString());
-				parse(new ArrayList<String>(tokens.subList(1, n)), left);
+				parse(new ArrayList<String>(tokens.subList(1, n)), left); // MAYBE issue
 				
 			} else {
 				left1 = new ArrayList<String>(tokens.subList(0, 1));
@@ -141,6 +145,9 @@ public class Parser {
 					i++;
 				}
 				ArrayList<String> rightt = new ArrayList<>(right1.subList(0, n-1));
+				if (n == tokens.size() - 1) {
+					parse(rightt, curnode);
+				}
 				Node right = new Node(rightt);
 				curnode.right = right;
 //				if (n == tokens.size()-1) {
