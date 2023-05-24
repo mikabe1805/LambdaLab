@@ -288,7 +288,7 @@ public class Parser {
 		int count = 0;
 		for (int j = 0; j < tokens.size(); j++) {
 			if (tokens.get(j).equals("(")) {
-				j = 1;
+				j++;
 				int n = 1; // n is the index of the last ) when num of  ( = num of )
 				int c = 0;
 				int o = 1;
@@ -307,7 +307,7 @@ public class Parser {
 				count++;
 			}
 		}
-		System.out.println(count);
+		//System.out.println(count);
 		if (count == 1) {
 			if (tokens.size() > 1) {
 				return parse(new ArrayList<String>(tokens.subList(1, tokens.size()-1)));
@@ -323,12 +323,19 @@ public class Parser {
 			} else {
 				lst2 = getList(new ArrayList<String>(tokens.subList(lst1.size(), tokens.size())));
 			}
-			System.out.println(lst2);
+			//System.out.println(lst2);
 			return new Node(parse(lst1), parse(lst2)); 
 		} else {
+			int parnum = 0;
 			ArrayList<String> lst1 = new ArrayList<String>(getList(tokens));
-			ArrayList<String> lst2 = getList(new ArrayList<String>(tokens.subList(lst1.size(), tokens.size())));
-			return new Node (new Node(parse(lst1), parse(lst2)), parse(new ArrayList<String>(tokens.subList(lst1.size() + lst2.size(), tokens.size()))));
+			if (tokens.get(0).equals("(")) {
+				parnum += 2;
+			}
+			ArrayList<String> lst2 = getList(new ArrayList<String>(tokens.subList(lst1.size() + parnum, tokens.size())));
+			if (tokens.get(lst1.size() + parnum).equals("(")) {
+				parnum += 2;
+			}
+			return new Node (new Node(parse(lst1), parse(lst2)), parse(new ArrayList<String>(tokens.subList(lst1.size() + lst2.size() + parnum, tokens.size()))));
 		}
 	}
 	/*
@@ -424,24 +431,46 @@ public class Parser {
 	
 	public ArrayList<String> preParse(ArrayList<String> tokens) {
 		int n;
-//		for (int i = 0; i < tokens.size(); i++) {
-//			if (tokens.get(i).equals("\\")) {
-//				if (i == 0 || !tokens.get(i-1).equals("(")) {
-//					tokens.add(i, "(");
-//					n = i;
-//					while (n < tokens.size() && !tokens.get(n).equals(")")) {
-//						n++;
-//					}
-//					tokens.add(n, ")");
-//				}
-//			}
-//		}
+		// wrap expression in parens
+		for (int i = 0; i < tokens.size(); i++) {
+			if (tokens.get(i).equals("\\")) {
+				if (i == 0 || !tokens.get(i-1).equals("(")) {
+					tokens.add(i, "(");
+					n = i;
+					int o = 0;
+					int c = 0;
+					while (n < tokens.size() && c <= o) {
+						if (tokens.get(n).equals("(")) {
+							o++;
+						} else if (tokens.get(n).equals(")")) {
+							c++;
+						}
+						n++;
+					}
+					tokens.add(n, ")");
+				}
+			}
+		}
+		// eat up things to the right
 		for (int i = 0; i < tokens.size(); i++) {
 			if (tokens.get(i).equals(".")) {
-				if (i == 0 || !tokens.get(i-1).equals("(")) {
+				if (i == 0 || !tokens.get(i+1).equals("(")) {
 					tokens.add(i+1, "(");
-					n = i;
-					while (n < tokens.size() && !tokens.get(n).equals(")")) {
+					n = i+2;
+					int o = 1;
+					int c = 0;
+					while (n < tokens.size() && c < o) { // PROBLEM TO FIX, reason \a.a works is bc exit condition not c and o like meant
+						//System.out.println(tokens.get(n));
+						if (tokens.get(n).equals("(")) {
+							o++;
+						} else if (tokens.get(n).equals(")") && c+1 < o) {
+							c++;
+							tokens.add(i+1, "(");
+							tokens.add(n+1, ")");
+							n+= 2;
+						} else if (tokens.get(n).equals(")")) {
+							c++;
+						}
 						n++;
 					}
 					tokens.add(n, ")");
