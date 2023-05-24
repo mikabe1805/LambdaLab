@@ -285,39 +285,45 @@ public class Parser {
 		Node curnode = new Node(null);
 		ArrayList<String> prob = new ArrayList<>();
 		prob.add("");
-		ArrayList<String> newtoks = new ArrayList<>();
 		int count = 0;
 		for (int j = 0; j < tokens.size(); j++) {
 			if (tokens.get(j).equals("(")) {
-				int i = 1;
+				j = 1;
 				int n = 1; // n is the index of the last ) when num of  ( = num of )
 				int c = 0;
 				int o = 1;
-				while (i < tokens.size() && c != o) {
-					if (tokens.get(i).equals(")")) {
-						n = i;
+				while (j < tokens.size() && c != o) {
+					if (tokens.get(j).equals(")")) {
+						n = j;
 						c++;
-					} else if (tokens.get(i).equals("(")) {
+					} else if (tokens.get(j).equals("(")) {
 						o++;
 					}
-					i++;
+					j++;
 				}
+				j--;
 				count++;
 			} else {
 				count++;
 			}
 		}
+		System.out.println(count);
 		if (count == 1) {
 			if (tokens.size() > 1) {
 				return parse(new ArrayList<String>(tokens.subList(1, tokens.size()-1)));
 			} else {
 			curnode = new Node(new ArrayList<String>(tokens.subList(0, 1)));
-			System.out.println(curnode.data);
 			return curnode;
 			}
 		} else if (count == 2) {
-			ArrayList<String> lst1 = getList(tokens);
-			ArrayList<String> lst2 = getList(new ArrayList<String>(tokens.subList(lst1.size(), tokens.size())));
+			ArrayList<String> lst1 = getList(tokens); // PROBLEM: paranthesis are not included as part of list
+			ArrayList<String> lst2 = new ArrayList<>();
+			if (tokens.get(0).equals("(")) {
+				lst2 = getList(new ArrayList<String>(tokens.subList(lst1.size()+2, tokens.size())));
+			} else {
+				lst2 = getList(new ArrayList<String>(tokens.subList(lst1.size(), tokens.size())));
+			}
+			System.out.println(lst2);
 			return new Node(parse(lst1), parse(lst2)); 
 		} else {
 			ArrayList<String> lst1 = new ArrayList<String>(getList(tokens));
@@ -387,7 +393,6 @@ public class Parser {
 	ArrayList<String> retval = new ArrayList<String>();
 	public void toString2 (Node curnode) {
 		if (curnode.left == null && curnode.right == null) {
-			System.out.println(curnode.data);
 			retval.addAll(curnode.data);
 			return;
 		} if (curnode.left != null) {
@@ -402,6 +407,7 @@ public class Parser {
 		for (int i = 0; i < retval.size(); i++) {
 			fn += retval.get(i) + " ";
 		}
+		retval = new ArrayList<String>();
 		return fn.substring(0, fn.length() - 1) + ")"; // - 1 to get rid of extra space
 	}
 	
