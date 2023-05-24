@@ -38,14 +38,14 @@ public class Console {
 				continue;
 			}
 			
-			Parser.Node root = new Parser.Node(null);
 			output = parser.preParse(tokens).toString();
-			tree = parser.parse(tokens, root);
+			tree = parser.parse(tokens);
 //			 output = exp.toString();
 			
 			System.out.println(output);
 			//System.out.println(tree.toString());
 			System.out.println(parser.toString(tree));
+			//System.out.println(tree.left.left.toString());
 			
 			input = cleanConsoleInput();
 		}

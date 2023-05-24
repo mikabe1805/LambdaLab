@@ -13,6 +13,12 @@ public class Parser {
 			this.left = null;
 			this.right = null;
 		}
+		
+		public Node(Node left, Node right) {
+			this.data = null; // maybe come back to this
+			this.left = left;
+			this.right = right;
+		}
 		public String toString() {
 			return "(" + left.data + " " + right.data + ")";
 		}
@@ -70,10 +76,10 @@ public class Parser {
 	}
 	
 	private 
-	*/
+
 	
 
-	public Node parse(ArrayList<String> tokens, Node curnode) {
+	public Node parse2(ArrayList<String> tokens, Node curnode) {
 		ArrayList<String> prob = new ArrayList<>();
 		prob.add("");
 		ArrayList<String> newtoks = new ArrayList<>();
@@ -96,7 +102,7 @@ public class Parser {
 					}
 					i++;
 				}
-				ArrayList<String> leftt = new ArrayList<>(left1.subList(0, n-1)); // error around here, it can't handle everything being in 1 set of paranthesis
+				ArrayList<String> leftt = new ArrayList<>(left1.subList(0, n-1)); // this is weird, idk why we're doing n-1 so check later
 				if (n == tokens.size() - 1) {
 					System.out.println("hi");
 					parse(leftt, curnode); // MAYBE problem
@@ -110,8 +116,18 @@ public class Parser {
 					newtoks = new ArrayList<String>(tokens.subList(n+1, tokens.size()));
 				}
 				curnode.data = prob;
-				System.out.println(tokens.subList(1, n).toString());
-				parse(new ArrayList<String>(tokens.subList(1, n)), left); // MAYBE issue
+				System.out.println("problem " + tokens.subList(1, n).toString());
+				if (n >= tokens.size()) {
+					System.out.println("hi?");
+					return parse(new ArrayList<String>(tokens.subList(1, n)), left);
+				} else {
+					System.out.println("yo");
+					Node neww = new Node(null);
+					Node idk = parse(new ArrayList<String>(tokens.subList(1, n)), left);
+					idk.toString();
+					neww.left = idk;
+					return parse(newtoks, neww); // MAYBE issue
+				}
 				
 			} else {
 				left1 = new ArrayList<String>(tokens.subList(0, 1));
@@ -159,60 +175,189 @@ public class Parser {
 					newtoks = new ArrayList<String>(tokens.subList(n+1, tokens.size()));
 				}
 				curnode.data = prob;
-				parse(new ArrayList<String>(tokens.subList(1, n)), right);
+				System.out.println(tokens.subList(1, n).toString());
+				if (n >= tokens.size()) {
+					return parse(new ArrayList<String>(tokens.subList(1, n)), right);
+				} else {
+					// here
+					System.out.println("hey??");
+					Node neww = new Node(null);
+					Node idk = parse(new ArrayList<String>(tokens.subList(1, n)), right);
+					idk.toString();
+					neww.left = idk;
+					return parse(newtoks, neww); // MAYBE issue
+				}
 			} else {
 				right1 = new ArrayList<String>(tokens.subList(0, 1));
 				Node right = new Node(right1);
 				curnode.right = right;
-				if (tokens.size() == 1) {
+				System.out.println("look here" + tokens.toString());
+				if (tokens.size() == 1) { // necessary??
+					System.out.println("problem with tokens");
 					curnode.data = prob;
 
 					return curnode;
 				}
 				curnode.data = prob;
 				newtoks = new ArrayList<String>(tokens.subList(1, tokens.size()));
-			}
-			
-			if (newtoks.size() > 0) {
-//				ArrayList<String> lst = new ArrayList<String>();
-//				lst.addAll(curnode.left.data); lst.addAll(curnode.right.data);
-				curnode.data = prob;
-				Node newNode = new Node(null);
-				newNode.left = curnode;
-				return parse(newtoks, newNode);
+				if (newtoks.size() > 0) {
+//					ArrayList<String> lst = new ArrayList<String>();
+//					lst.addAll(curnode.left.data); lst.addAll(curnode.right.data);
+					curnode.data = prob;
+					Node newNode = new Node(null);
+					newNode.left = curnode;
+					return parse(newtoks, newNode);
+				}
 			}
 		}
 		
 		return parse(newtoks, curnode);
 	}
-	
-	private ArrayList<String> toStringg(Node curnode) {
+	*/
+	private ArrayList<String> getList(ArrayList<String> toks) {
+		ArrayList<String> finall = new ArrayList<String>();
+		if (toks.get(0).equals("(")) {
+			int i = 1;
+			int n = 1; // n is the index of the last ) when num of  ( = num of )
+			int c = 0;
+			int o = 1;
+			while (i < toks.size() && c != o) {
+				finall.add(toks.get(i));
+				if (toks.get(i).equals(")")) {
+					n = i;
+					c++;
+				} else if (toks.get(i).equals("(")) {
+					o++;
+				}
+				i++;
+			}
+			finall = new ArrayList<>(finall.subList(0, n-1));
+		} else {
+			finall.add(toks.get(0));
+		}
+		
+		return finall;
+	}
+	/*
+	public Expression parse3(ArrayList<String> tokens) {
+		ArrayList<String> prob = new ArrayList<>();
+		prob.add("");
+		ArrayList<String> newtoks = new ArrayList<>();
+		int count = 0;
+		for (int j = 0; j < tokens.size(); j++) {
+			if (tokens.get(j).equals("(")) {
+				int i = 1;
+				int n = 1; // n is the index of the last ) when num of  ( = num of )
+				int c = 0;
+				int o = 1;
+				while (i < tokens.size() && c != o) {
+					if (tokens.get(i).equals(")")) {
+						n = i;
+						c++;
+					} else if (tokens.get(i).equals("(")) {
+						o++;
+					}
+					i++;
+				}
+				count++;
+			} else {
+				count++;
+			}
+		}
+		if (count == 1) {
+			if (tokens.size() > 1) {
+				return parse(new ArrayList<String>(tokens.subList(1, tokens.size()-1)));
+			} else {
+			return new Variable(tokens.get(0));
+			}
+		} else if (count == 2) {
+			ArrayList<String> lst1 = new ArrayList<String>(tokens);
+			ArrayList<String> lst2 = new ArrayList<String>(new ArrayList<String>(tokens.subList(lst1.size(), tokens.size())));
+			return new Application(parse(lst1), parse(lst2)); // maybe change to node
+		} else {
+			ArrayList<String> lst1 = new ArrayList<String>(tokens);
+			ArrayList<String> lst2 = new ArrayList<String>(new ArrayList<String>(tokens.subList(lst1.size(), tokens.size())));
+			return new Application (new Application(parse(lst1), parse(lst2)), parse(new ArrayList<String>(tokens.subList(lst1.size() + lst2.size(), tokens.size())));
+		}
+	}
+	*/
+	public Node parse(ArrayList<String> tokens) {
+		Node curnode = new Node(null);
+		ArrayList<String> prob = new ArrayList<>();
+		prob.add("");
+		ArrayList<String> newtoks = new ArrayList<>();
+		int count = 0;
+		for (int j = 0; j < tokens.size(); j++) {
+			if (tokens.get(j).equals("(")) {
+				int i = 1;
+				int n = 1; // n is the index of the last ) when num of  ( = num of )
+				int c = 0;
+				int o = 1;
+				while (i < tokens.size() && c != o) {
+					if (tokens.get(i).equals(")")) {
+						n = i;
+						c++;
+					} else if (tokens.get(i).equals("(")) {
+						o++;
+					}
+					i++;
+				}
+				count++;
+			} else {
+				count++;
+			}
+		}
+		if (count == 1) {
+			if (tokens.size() > 1) {
+				return parse(new ArrayList<String>(tokens.subList(1, tokens.size()-1)));
+			} else {
+			curnode = new Node(new ArrayList<String>(tokens.subList(0, 1)));
+			System.out.println(curnode.data);
+			return curnode;
+			}
+		} else if (count == 2) {
+			ArrayList<String> lst1 = getList(tokens);
+			ArrayList<String> lst2 = getList(new ArrayList<String>(tokens.subList(lst1.size(), tokens.size())));
+			return new Node(parse(lst1), parse(lst2)); 
+		} else {
+			ArrayList<String> lst1 = new ArrayList<String>(getList(tokens));
+			ArrayList<String> lst2 = getList(new ArrayList<String>(tokens.subList(lst1.size(), tokens.size())));
+			return new Node (new Node(parse(lst1), parse(lst2)), parse(new ArrayList<String>(tokens.subList(lst1.size() + lst2.size(), tokens.size()))));
+		}
+	}
+	/*
+	private ArrayList<String> toStringg(Node curnode) { // REPROGRAM TO STRING
 		Node def = curnode;
 		ArrayList<String> out = new ArrayList<>();
-		if (curnode.left != null) {
+		while (curnode.left != null) {
 				if (curnode.left.data != null) {
-				out.addAll(0, curnode.left.data);
-				curnode = curnode.left;
-				while (curnode.left != null) {
 					out.addAll(0, curnode.left.data);
-					if (curnode.right != null) {
+					//curnode = curnode.left;
+					while (curnode.right != null) { // maybe go back to this
 						if (curnode.right.data != null) {
 							out.addAll(curnode.left.data.size(), curnode.right.data);
-							out.addAll(curnode.left.data.size() + curnode.right.data.size(), toStringg(curnode.right));
+							out.addAll(curnode.left.data.size() + curnode.right.data.size(), toStringg(curnode.right)); // i think that's right??
+						}
+						else {
+							toStringg(curnode.right); // MAYBE??
 						}
 					}
 					curnode = curnode.left;
-				}
+			} else {
+				curnode = curnode.left;
 			}
 		}
-		if (def.right != null) {
+		while (def.right != null) { // maybe..
 				if (def.right.data != null) {
 					out.addAll(def.right.data);
 					int size = def.right.data.size();
-					def = def.right;
 				
 					while (def.left != null) {
-						out.addAll(out.size() - size, def.left.data);
+						if (def.left.data != null) {
+							out.addAll(out.size() - size, def.left.data);
+						} else {
+							toStringg(curnode.left);
+						}
 						if (def.right != null) {
 							if (def.right.data != null) {
 								out.addAll(def.right.data);
@@ -220,14 +365,16 @@ public class Parser {
 							}
 						}
 						def = def.left;
-				}
+					}
+			} else {
+				curnode = curnode.left;
 			}
 		}
 		return out;
 		
 	}
 	
-	public String toString(Node curnode) {
+	public String toStringggg(Node curnode) {
 		ArrayList<String> ar = toStringg(curnode);
 		String fn = "(";
 		for (int i = 0; i < ar.size(); i++) {
@@ -236,7 +383,33 @@ public class Parser {
 		return fn.substring(0, fn.length() - 1) + ")";
 		
 	}
+	*/
+	ArrayList<String> retval = new ArrayList<String>();
+	public void toString2 (Node curnode) {
+		if (curnode.left == null && curnode.right == null) {
+			System.out.println(curnode.data);
+			retval.addAll(curnode.data);
+			return;
+		} if (curnode.left != null) {
+			toString2 (curnode.left);
+		} if (curnode.right != null) {
+			toString2 (curnode.right);
+		}
+	}
+	public String toString (Node curnode) {
+		toString2(curnode);
+		String fn = "(";
+		for (int i = 0; i < retval.size(); i++) {
+			fn += retval.get(i) + " ";
+		}
+		return fn.substring(0, fn.length() - 1) + ")"; // - 1 to get rid of extra space
+	}
 	
+//	public String toString(Expression exp) {
+//		String fn = "(";
+//		Expression left = exp.left;
+//		for (int i )
+//	}
 //	public Node parse(ArrayList<String> tokens, Node curnode) {
 //	return new Node(new ArrayList<String>(tokens.subList(0, 1)));
 //	}
