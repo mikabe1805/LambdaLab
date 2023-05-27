@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Scanner;
 
 import Parser.Node;
 
@@ -93,7 +92,7 @@ public class Console {
 		for (int i = 0; i < tokens.size(); i++) {
 			if (dict.containsKey(tokens.get(i))) {
 				String n = tokens.get(i);
-				System.out.println((dict.get(n)).ogToks);
+				//System.out.println((dict.get(n)).ogToks);
 				tokens.addAll(i, (dict.get(n)).ogToks);
 				
 				tokens.remove(i + (dict.get(n)).ogToks.size());
