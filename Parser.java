@@ -9,6 +9,7 @@ public class Parser {
 		Node left;
 		Node right;
 		ArrayList<String> ogToks = new ArrayList<String>();
+		String type = "";
 		public Node(ArrayList<String> data) {
 			this.data = data;
 			this.left = null;
@@ -23,6 +24,33 @@ public class Parser {
 		public String toString() {
 			return "(" + left.data + " " + right.data + ")";
 		}
+		
+//		ArrayList<Boolean> maybe = new ArrayList<>();
+//		public void containss (Node curnode, String str) {
+//			if (curnode.data.get(0).equals(str)) {
+//				maybe.add(true);
+//				return;
+//			}
+//			if (curnode.left == null && curnode.right == null) {
+//				maybe.add(false);
+//				return;
+//			}
+//			if (curnode.left != null) {
+//				containss(curnode.left, str);
+//			} if (curnode.right != null) {
+//				containss (curnode.right, str);
+//			}
+//		}
+//		public boolean contains (Node curnode, String str) {
+//			containss(curnode, str);
+//			if (maybe.contains(true)) {
+//				maybe = new ArrayList<>();
+//				return true;
+//			} else {
+//				maybe = new ArrayList<>();
+//				return false;
+//			}
+//		}
 	}
 	
 	/*
@@ -91,6 +119,7 @@ public class Parser {
 			} else {
 			curnode = new Node(new ArrayList<String>(tokens.subList(0, 1)));
 			curnode.ogToks.addAll(realToks);
+			curnode.type = "V";
 			return curnode;
 			}
 		} else if (count == 2) {
@@ -104,8 +133,9 @@ public class Parser {
 			//System.out.println(lst2);
 			curnode = new Node(parse(lst1), parse(lst2)); 
 			curnode.ogToks.addAll(realToks);
+			curnode.type = "A";
 			return curnode;
-		} else {
+		} else { // this could potentially be a function. I'm gonna split it into 2 scenarios to take account of funcitons
 			int parnum = 0;
 			ArrayList<String> lst1 = new ArrayList<String>(getList(tokens));
 			if (tokens.get(0).equals("(")) {
@@ -117,8 +147,14 @@ public class Parser {
 			}
 			Node node2 = new Node(parse(lst1), parse(lst2));
 			node2.ogToks.addAll(realToks);
+			if (lst1.contains("\\")) {
+				node2.type = "F";
+			} else {
+				node2.type = "A";
+			}
 			curnode = new Node (node2, parse(new ArrayList<String>(tokens.subList(lst1.size() + lst2.size() + parnum, tokens.size()))));
 			curnode.ogToks.addAll(realToks);
+			curnode.type = "A";
 			return curnode;
 		}
 	}
@@ -134,6 +170,7 @@ public class Parser {
 			toString2 (curnode.right);
 		}
 	}
+	
 	public String toString3 (Node curnode) {
 		toString2(curnode);
 		String fn = "(";

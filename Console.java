@@ -37,7 +37,11 @@ public class Console {
 				input = cleanConsoleInput();
 				continue;
 			}
-			
+			if (tokens.get(0).equals("run")) {
+				tokens = tokFix(tokens, dict);
+				tree = parser.parse(new ArrayList<String>(tokens.subList(1, tokens.size())));
+				Runner.run(tree);
+			}
 			if (tokens.contains("=")) {
 				String varName = "";
 				for (int i = 0; i < tokens.indexOf("="); i++) {
