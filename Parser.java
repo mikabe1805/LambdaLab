@@ -136,8 +136,9 @@ public class Parser {
 			curnode.type = "A";
 			return curnode;
 		} else { // this could potentially be a function. I'm gonna split it into 2 scenarios to take account of funcitons
+			// cur problem: app of \x is getting assigned func
 			int parnum = 0;
-			ArrayList<String> lst1 = new ArrayList<String>(getList(tokens));
+			ArrayList<String> lst1 = new ArrayList<String>(getList(tokens)); // maybe what you should do is check for the thing that goes in if it has the app w \x
 			if (tokens.get(0).equals("(")) {
 				parnum += 2;
 			}
@@ -147,14 +148,14 @@ public class Parser {
 			}
 			Node node2 = new Node(parse(lst1), parse(lst2));
 			node2.ogToks.addAll(realToks);
-			if (lst1.contains("\\")) {
-				node2.type = "F";
-			} else {
-				node2.type = "A";
-			}
+			node2.type = "A";
 			curnode = new Node (node2, parse(new ArrayList<String>(tokens.subList(lst1.size() + lst2.size() + parnum, tokens.size()))));
 			curnode.ogToks.addAll(realToks);
-			curnode.type = "A";
+			if (lst1.contains("\\")) {
+				curnode.type = "F";
+			} else {
+				curnode.type = "A";
+			}
 			return curnode;
 		}
 	}

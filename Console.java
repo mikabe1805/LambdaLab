@@ -85,6 +85,10 @@ public class Console {
 					tree = parser.parse(tokens); // PARSING!
 					System.out.println(parser.toString(tree));
 				}
+				//for testing
+				Parser.Node test = Runner.appfinder(tree);
+				System.out.println(parser.toString3(test));
+				System.out.println(test.type);
 			}
 			
 			
