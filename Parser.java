@@ -161,25 +161,59 @@ public class Parser {
 	}
 	
 	ArrayList<String> retval = new ArrayList<String>();
+	int spec = 0;
 	public void toString2 (Node curnode) {
-		if (curnode.left == null && curnode.right == null) {
-			retval.addAll(curnode.data);
-			return;
-		} if (curnode.left != null) {
-			toString2 (curnode.left);
-		} if (curnode.right != null) {
-			toString2 (curnode.right);
+		if (curnode.type.equals("F")) {
+			spec = 1;
+			retval.add("(");
+			if (curnode.left == null && curnode.right == null) {
+				retval.addAll(curnode.data);
+				return;
+			} if (curnode.left != null) {
+				toString2 (curnode.left);
+			} if (curnode.right != null) {
+				curnode = curnode.right;
+				retval.addAll(curnode.left.data); // this is going to be the period
+				retval.add("(");
+				toString2(curnode.right);
+				retval.add(")");
+			}
+			retval.add(")");
+			spec = 0;
+		} 
+		else if (spec == 1) { // it's own version of things
+			if (curnode.left == null && curnode.right == null) {
+				retval.addAll(curnode.data);
+				return;
+			} if (curnode.left != null) {
+				toString2 (curnode.left);
+			} if (curnode.right != null) {
+				toString2 (curnode.right);
+			}
+		} else {
+			if (curnode.type.equals("A")) {
+				retval.add("(");
+			}
+			if (curnode.left == null && curnode.right == null) {
+				retval.addAll(curnode.data);
+				return;
+			} if (curnode.left != null) {
+				toString2 (curnode.left);
+			} if (curnode.right != null) {
+				toString2 (curnode.right);
+				retval.add(")");
+			}
 		}
 	}
 	
 	public String toString3 (Node curnode) {
 		toString2(curnode);
-		String fn = "(";
+		String fn = "";
 		for (int i = 0; i < retval.size(); i++) {
 			fn += retval.get(i) + " ";
 		}
 		retval = new ArrayList<String>();
-		return fn.substring(0, fn.length() - 1) + ")"; // - 1 to get rid of extra space
+		return fn.substring(0, fn.length() - 1); // - 1 to get rid of extra space
 	}
 	
 	public String toString (Node curnode) {

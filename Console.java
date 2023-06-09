@@ -5,9 +5,8 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import Parser.Node;
-
+import Runner.Runner;
 
 public class Console {
 	private static Scanner in;
@@ -40,7 +39,8 @@ public class Console {
 			if (tokens.get(0).equals("run")) {
 				tokens = tokFix(tokens, dict);
 				tree = parser.parse(new ArrayList<String>(tokens.subList(1, tokens.size())));
-				Runner.run(tree);
+				Parser.Node ran = Runner.run(tree);
+				System.out.println(parser.toString3(ran));
 			}
 			if (tokens.contains("=")) {
 				String varName = "";
@@ -86,9 +86,20 @@ public class Console {
 					System.out.println(parser.toString(tree));
 				}
 				//for testing
-				Parser.Node test = Runner.appfinder(tree);
-				System.out.println(parser.toString3(test));
-				System.out.println(test.type);
+//				Parser.Node test = Runner.appfinder(tree); 
+//				ArrayList<String> test2 = Runner.appfinder2(tree, new ArrayList<String>());
+//				Parser.Node test3 = Runner.funcfinder(tree);
+//				System.out.println(parser.toString3(test));
+//				System.out.println(test2.toString());
+//				Parser.Node test4 = Runner.varreplacer(test3.right.right, test3.left.right.data.get(0), test.left);
+////				ArrayList<String> annoying = new ArrayList<>();
+////				annoying.add("B");
+////				Parser.Node test4 = Runner.varreplacer(test3.right, "x", new Parser.Node(annoying));
+//				System.out.println(parser.toString3(test4));
+//				Parser.Node test5 = Runner.finalNode(tree, test4, test2);
+//				System.out.println(parser.toString(test5));
+				//System.out.println(parser.toString3(Runner.run(tree)));
+				// next problem: fix to string.
 			}
 			
 			
