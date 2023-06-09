@@ -163,7 +163,7 @@ public class Parser {
 	ArrayList<String> retval = new ArrayList<String>();
 	int spec = 0;
 	public void toString2 (Node curnode) {
-		if (curnode.type.equals("F")) {
+		if (curnode.type.equals("F") && spec == 0) {
 			spec = 1;
 			retval.add("(");
 			if (curnode.left == null && curnode.right == null) {
@@ -205,6 +205,18 @@ public class Parser {
 			}
 		}
 	}
+	
+	public void toString4 (Node curnode) {
+			if (curnode.left == null && curnode.right == null) {
+				retval.addAll(curnode.data);
+				System.out.println(curnode.data.toString());
+				return;
+			} if (curnode.left != null) {
+				toString4 (curnode.left);
+			} if (curnode.right != null) {
+				toString4 (curnode.right);
+			}
+		}
 	
 	public String toString3 (Node curnode) {
 		toString2(curnode);
