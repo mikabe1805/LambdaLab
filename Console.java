@@ -2,6 +2,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -30,7 +31,7 @@ public class Console {
 			String output = "";
 			Parser.Node tree = new Parser.Node(null);
 			
-			
+			try {
 				if (tokens.size() == 0) {
 					System.out.println();
 				}
@@ -50,7 +51,12 @@ public class Console {
 						runs++;
 						//System.out.println(parser.toString(ran));
 					}
-					System.out.println(parser.toString6(ran));
+					//System.out.println(dict.toString());
+					if (dict.containsValue(ran)) {
+						System.out.println(getKeys(dict, ran).toString());
+					} else {
+						System.out.println(parser.toString6(ran));
+					}
 					//System.out.println(parser.toString6(tree));
 				}
 				else if (tokens.contains("=")) {
@@ -106,11 +112,15 @@ public class Console {
 					} else {
 						tokens = tokFix(tokens, dict);
 						tree = parser.parse(tokens); // PARSING!
-						System.out.println(parser.toString6(tree));
+						if (dict.containsValue(tree)) {
+							System.out.println(getKeys(dict, tree).toString());
+						} else {
+							System.out.println(parser.toString6(tree));
+						}
 					}
 				}
-				try {
 				
+//				try {
 			} catch (Exception e) {
 				System.out.println("Unparsable expression, input was: \"" + input + "\"");
 				input = cleanConsoleInput();
@@ -156,12 +166,31 @@ public class Console {
 				
 				tokens.remove(i + toks.size());
 			}
-
 		}
 		System.out.println(tokens);
 		return tokens;
 		
 	}
+	
+	
+	private static String getKeys(Map<String, Parser.Node> map, Parser.Node value) {
+			Parser parser = new Parser();
+	      String result = "";
+	      String mapp = map.toString();
+	      String[] mappp = mapp.split("=");
+	      for (int i = 0; i < mappp.length; i++) {
+	    	  if (mappp[i].substring(0, mappp[i].length()-1).equals("(null null)")) {
+	    		  mappp[i] = parser.toString(map.get(mappp[i-1]));
+	    	  }
+	      }
+	      for (int i = 0; i < mappp.length; i++) {
+	    	  if (mappp[i].equals(value.toString())) {
+	    		  result += mappp[i-1];
+	    	  }
+	      }
+	      return result;
+
+	  }
 
 	
 	

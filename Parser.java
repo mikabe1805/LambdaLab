@@ -1,6 +1,8 @@
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Parser {
 	
@@ -9,6 +11,7 @@ public class Parser {
 		Node left;
 		Node right;
 		ArrayList<String> ogToks = new ArrayList<String>();
+		String backup = "";
 		String type = "";
 		public Node(ArrayList<String> data) {
 			this.data = data;
@@ -245,7 +248,10 @@ public class Parser {
 	
 	ArrayList<String> retval = new ArrayList<String>();
 	int spec = 0;
-	public void toString2 (Node curnode) {
+	public void toString15 (Node curnode) {
+		if (curnode.data != null) {
+			System.out.println(curnode.data);
+		}
 		if (curnode.type.equals("F") && spec == 0) {
 			spec = 1;
 			retval.add("(");
@@ -286,6 +292,106 @@ public class Parser {
 				toString2 (curnode.right);
 				retval.add(")");
 			}
+		}
+	}
+	
+	int add = 0;
+	public void toString5(Node curnode) {
+		if (curnode.left == null && curnode.right == null) {
+			retval.addAll(curnode.data);
+			return;
+		}
+		if (curnode.left != null) {
+			toString5(curnode.left);
+		}
+		if (curnode.right != null) {
+			toString5(curnode.right);
+		}
+	}
+	
+	public void toString8(Node curnode) {
+		Parser parser = new Parser();
+		toString5(curnode);
+		retval = parser.preParse(retval);
+	}
+	
+	int runNum = 0;
+	Parser.Node backupp = new Parser.Node(null);
+	public void toString2 (Node curnode) { // REWORK!!!
+		runNum++;
+		if (runNum == 1) {
+			backupp = curnode;
+		}
+		if (runNum < 1000) {
+			if (curnode.type.equals("F") && spec == 0) {
+	//			retval.add("func");
+				spec = 1;
+				retval.add("(");
+				add++;
+				if (curnode.left == null && curnode.right == null) {
+					retval.addAll(curnode.data);
+					return;
+				} if (curnode.left != null) {
+					toString2 (curnode.left);
+				} if (curnode.right != null) {
+	//				retval.addAll(curnode.left.data); // this is going to be the period 
+	//				retval.add("(");
+	//				add++;
+					toString2(curnode.right); // MIKA! bring commented back code and make toString2(curnode.right) and get rid of stuff in the bottom with 
+					// variable if you fail the failure cases.
+					retval.add(")");
+					add--;
+				}
+				while (add > 0) {
+					retval.add(")");
+					add--;
+				}
+				spec = 0;
+			} 
+			else if (spec == 1) { // it's own version of things
+	//			if (curnode.type.equals("A")) {
+	//				retval.add("app");
+	//			} 
+			if (curnode.type.equals("F")) {
+					retval.add("(");
+					add++;
+				}
+				if (curnode.left == null && curnode.right == null) {
+					retval.addAll(curnode.data);
+	//				if (curnode.data.get(0).equals(".")) {
+	//					retval.add("(");
+	//					add++;
+	//				}
+					return;
+				} if (curnode.left != null) {
+					toString2 (curnode.left);
+				} if (curnode.right != null) {
+					toString2 (curnode.right);
+				}
+			} else {
+				if (curnode.type.equals("A")) {
+					retval.add("(");
+					//add++;
+	//				retval.add("app");
+				} 
+	//			if (curnode.type.equals("F")) {
+	//				retval.add("func");
+	//			}
+				if (curnode.left == null && curnode.right == null) {
+					retval.addAll(curnode.data);
+					return;
+				} if (curnode.left != null) {
+					toString2 (curnode.left);
+				} if (curnode.right != null) {
+					toString2 (curnode.right);
+					retval.add(")");
+					add--;
+				}
+			}
+		}
+		else {
+			System.out.println("Sorry Mr. Isecke, this isn't working :(");
+			//retval = (ArrayList<String>) Arrays.asList(backupp.backup.split(""));
 		}
 	}
 	
@@ -349,6 +455,9 @@ public class Parser {
 		int o = 0;
 		int c = 0;
 		String fn = "";
+		if (retval.size() == 0) {
+			return "";
+		}
 		toString2(curnode);
 		//System.out.println(retval.size());
 		for (int i = 0; i < retval.size(); i++) {
@@ -399,6 +508,9 @@ public class Parser {
 		int o = 0;
 		int c = 0;
 		toString2(curnode);
+		if (retval.size() == 0) {
+			return new ArrayList<>();
+		}
 		String fn = "";
 		for (int i = 0; i < retval.size(); i++) {
 			fn += retval.get(i) + " ";
