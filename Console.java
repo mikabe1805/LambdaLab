@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -11,7 +12,7 @@ import Runner.Runner;
 public class Console {
 	private static Scanner in;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) { // run is not getting applied with functions :(
 		in = new Scanner (System.in); // just for fun
 		
 		Lexer lexer = new Lexer();
@@ -19,6 +20,7 @@ public class Console {
 		Map<String, Parser.Node> dict = new HashMap<String, Parser.Node>();
 		
 		String input = cleanConsoleInput();  // see comment
+		
 		
 		while (! input.equalsIgnoreCase("exit")) {
 			
@@ -28,63 +30,93 @@ public class Console {
 			String output = "";
 			Parser.Node tree = new Parser.Node(null);
 			
-			try {
-				//output = parser.preParse(tokens).toString();
+			
+				if (tokens.size() == 0) {
+					System.out.println();
+				}
+				else if (tokens.get(0).equals("run")) {
+					tokens = tokFix(tokens, dict);
+					tokens = parser.preParse(tokens); // check out why it's being weird
+					//System.out.println(tokens);
+					tree = parser.parse(new ArrayList<String>(tokens.subList(1, tokens.size())));
+					//System.out.println(parser.toString(tree)); // gets sucked in somehow.. maybe check it out
+					//System.out.println(parser.toString(tree)); // run \a. (\b. \a. b a) a
+					Parser.Node ran = Runner.run(tree);
+					//System.out.println(parser.toString(ran));
+					// i think it thinks it's not runabble anymore when it is
+					int runs = 0;
+					while (Runner.isRunnable(ran) && runs < 5) {
+						ran = Runner.run(ran);
+						runs++;
+						//System.out.println(parser.toString(ran));
+					}
+					System.out.println(parser.toString6(ran));
+					//System.out.println(parser.toString6(tree));
+				}
+				else if (tokens.contains("=")) {
+					String varName = "";
+					for (int i = 0; i < tokens.indexOf("="); i++) {
+						varName += tokens.get(i) + " ";
+					}
+					varName = varName.substring(0, varName.length() - 1); // gets rid of last space
+					if (dict.containsKey(varName)) {
+						System.out.println(varName + " is already defined.");
+					} else {
+						tokens = tokFix(tokens, dict);
+						//System.out.println(tokens);
+						tokens = parser.preParse(tokens);
+						if (tokens.contains("run")) {
+							tree = parser.parse(new ArrayList<String>(tokens.subList(tokens.indexOf("=") + 2, tokens.size())));
+							tree = Runner.run(tree);
+							int runs = 0;
+							while (Runner.isRunnable(tree) && runs < 5) {
+								tree = Runner.run(tree);
+								runs++;
+							}
+						} else {
+							tree = parser.parse(new ArrayList<String>(tokens.subList(tokens.indexOf("=") + 1, tokens.size()))); // PARSING!
+						}
+						dict.put(tokens.get(0), tree);
+						System.out.println("Added " + parser.toString6(tree) + " as " + tokens.get(0));
+						// this is just a fun extra, it's not meant to be taken seriously
+						if (tokens.indexOf("=") != 1) {
+							System.out.println("(Hey buddy, just so you know, you can't have spaces in variable names.)");
+							System.out.println("Want me to make an exception though, just for you? (y/n)");
+							String ans = in.nextLine();
+							if (ans.equals("y")) {
+								dict.remove(tokens.get(0));
+								dict.put(varName, tree);
+								System.out.println("Added " + parser.toString6(tree) + " as " + varName);
+								System.out.println("Just so you know, you're not gonna be able to reference this as part of a bigger function. I have my limits.");
+							} else if (ans.equals("n")) {
+								System.out.println("Oh. Alright then. Why are you even using this program");
+							} else {
+								System.out.println("Wow you're REALLY bad at following directions huh");
+							}
+						}
+					}
+				} else {
+					String temp = "";
+					for (int i = 0; i < tokens.size(); i++) {
+						temp += tokens.get(i) + " ";
+					}
+					temp = temp.substring(0, temp.length() - 1); // gets rid of last space
+					if (dict.containsKey(temp)) { // not sure what this means..
+						System.out.println(parser.toString6(dict.get(temp)));
+					} else {
+						tokens = tokFix(tokens, dict);
+						tree = parser.parse(tokens); // PARSING!
+						System.out.println(parser.toString6(tree));
+					}
+				}
+				try {
 				
 			} catch (Exception e) {
 				System.out.println("Unparsable expression, input was: \"" + input + "\"");
 				input = cleanConsoleInput();
 				continue;
 			}
-			if (tokens.get(0).equals("run")) {
-				tokens = tokFix(tokens, dict);
-				tree = parser.parse(new ArrayList<String>(tokens.subList(1, tokens.size())));
-				Parser.Node ran = Runner.run(tree);
-				System.out.println(parser.toString3(ran));
-			}
-			if (tokens.contains("=")) {
-				String varName = "";
-				for (int i = 0; i < tokens.indexOf("="); i++) {
-					varName += tokens.get(i) + " ";
-				}
-				varName = varName.substring(0, varName.length() - 1); // gets rid of last space
-				if (dict.containsKey(varName)) {
-					System.out.println(varName + " is already defined.");
-				} else {
-					tokens = tokFix(tokens, dict);
-					tree = parser.parse(new ArrayList<String>(tokens.subList(tokens.indexOf("=") + 1, tokens.size()))); // PARSING!
-					dict.put(tokens.get(0), tree);
-					System.out.println("Added " + parser.toString(tree) + " as " + tokens.get(0));
-					// this is just a fun extra, it's not meant to be taken seriously
-					if (tokens.indexOf("=") != 1) {
-						System.out.println("(Hey buddy, just so you know, you can't have spaces in variable names.)");
-						System.out.println("Want me to make an exception though, just for you? (y/n)");
-						String ans = in.nextLine();
-						if (ans.equals("y")) {
-							dict.remove(tokens.get(0));
-							dict.put(varName, tree);
-							System.out.println("Added " + parser.toString(tree) + " as " + varName);
-							System.out.println("Just so you know, you're not gonna be able to reference this as part of a bigger function. I have my limits.");
-						} else if (ans.equals("n")) {
-							System.out.println("Oh. Alright then. Why are you even using this program");
-						} else {
-							System.out.println("Wow you're REALLY bad at following directions huh");
-						}
-					}
-				}
-			} else {
-				String temp = "";
-				for (int i = 0; i < tokens.size(); i++) {
-					temp += tokens.get(i) + " ";
-				}
-				temp = temp.substring(0, temp.length() - 1); // gets rid of last space
-				if (dict.containsKey(temp)) {
-					System.out.println(parser.toString(dict.get(temp)));
-				} else {
-					tokens = tokFix(tokens, dict);
-					tree = parser.parse(tokens); // PARSING!
-					System.out.println(parser.toString(tree));
-				}
+			
 				//for testing
 //				Parser.Node test = Runner.appfinder(tree); 
 //				ArrayList<String> test2 = Runner.appfinder2(tree, new ArrayList<String>());
@@ -100,7 +132,8 @@ public class Console {
 //				System.out.println(parser.toString(test5));
 				//System.out.println(parser.toString3(Runner.run(tree)));
 				// next problem: fix to string.
-			}
+				//System.out.println(Runner.contains(tree, "x"));
+				//System.out.println(Runner.changedName(tree));
 			
 			
 			input = cleanConsoleInput();
@@ -108,16 +141,24 @@ public class Console {
 		System.out.println("Goodbye!");
 	}
 	private static ArrayList<String> tokFix(ArrayList<String> tokens, Map<String, Parser.Node> dict) {
+		Parser parser = new Parser();
 		for (int i = 0; i < tokens.size(); i++) {
 			if (dict.containsKey(tokens.get(i))) {
 				String n = tokens.get(i);
 				//System.out.println((dict.get(n)).ogToks);
-				tokens.addAll(i, (dict.get(n)).ogToks);
+				Parser.Node node = dict.get(n);
+//				String str = parser.toString(node);
+//				String[] strr = str.split(" ");
+				ArrayList<String> toks = new ArrayList<String>();
+//				toks = new ArrayList<String>(Arrays.asList(strr));
+				toks = node.ogToks;
+				tokens.addAll(i, toks);
 				
-				tokens.remove(i + (dict.get(n)).ogToks.size());
+				tokens.remove(i + toks.size());
 			}
 
 		}
+		System.out.println(tokens);
 		return tokens;
 		
 	}
